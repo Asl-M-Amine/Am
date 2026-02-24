@@ -1,39 +1,24 @@
-# Makefile for A-MAZE-ING
-# Terminal Maze Generator & Solver
 
-# Python interpreter
-PYTHON = python3
+install:
+	pip3 install -r requirements.txt
 
-# Config file
-CONFIG = config.txt
-
-# Output maze file
-OUTPUT = maze.txt
-
-# Default target: run the game
-.PHONY: run
 run:
-	$(PYTHON) a_maze_ing.py $(CONFIG)
+	@python3 a_maze_ing.py config.txt
 
-# Regenerate maze to file only
-.PHONY: generate
-generate:
-	$(PYTHON) -c "from config import load_config; from a_maze_ing import generate_and_render; cfg = load_config('$(CONFIG)'); generate_and_render(cfg, 0)"
+debug:
+	@python3 -m pdb a_maze_ing.py config.txt
 
-# Clean output files and Python cache
-.PHONY: clean
 clean:
-	rm -f $(OUTPUT)
-	rm -rf __pycache__
-	find . -name "__pycache__" -type d -exec rm -rf {} +
+	@find -name "__pycache__" -exec rm -rf {} +
+	@rm -rf .mypy_cache
 
-# Help
-.PHONY: help
-help:
-	@echo "Usage: make [target]"
-	@echo ""
-	@echo "Targets:"
-	@echo "  run       Run the maze game"
-	@echo "  generate  Generate maze file only"
-	@echo "  clean     Remove generated files"
-	@echo "  help      Show this help message"
+
+lint:
+	python3 -m flake8 .
+	python3 -m  mypy . \
+		--warn-return-any \
+		--warn-unused-ignores \
+		--ignore-missing-imports \
+		--disallow-untyped-defs \
+		--check-untyped-defs
+

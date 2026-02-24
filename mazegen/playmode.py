@@ -45,8 +45,10 @@ class PlayMode:
             os.system("cls" if os.name == "nt" else "clear")
 
             # Status bar with hearts, steps, exit
-            hearts_display = "".join(["\033[1;31m\u2665\033[0m " for _ in hearts])
-            status_bar = f"[ {hearts_display}]  Steps: {steps}  Exit: ({goal_x},{goal_y})"
+            hearts_display = ("".join(["\033[1;31m\u2665\033[0m "
+                                       for _ in hearts]))
+            status_bar = (f"[ {hearts_display}]  Steps: {steps}  "
+                          f"Exit: ({goal_x},{goal_y})")
             border = "═" * len(status_bar)
 
             print(f"╔{border}╗")
@@ -54,7 +56,8 @@ class PlayMode:
             print(f"╚{border}╝")
 
             # Fun instruction line (Pac-Man style)
-            print("Guide the mouse 🐁 with W/A/S/D. Can you escape to the cheese 🧀?\n")
+            print("Guide the mouse 🐁 with W/A/S/D. Can you escape to "
+                  "the cheese 🧀?\n")
             render_ascii(
                 maze.get_cells(),
                 entry=(px, py),

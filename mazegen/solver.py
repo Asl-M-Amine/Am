@@ -1,5 +1,3 @@
-# In solver.py
-
 from renderer import PALETTES, get_42_pattern_coords, render_ascii
 import os
 import time
