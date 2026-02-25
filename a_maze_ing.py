@@ -8,7 +8,7 @@ import random
 from animations import show_intro
 from config import load_config, ConfigError
 from mazegen import MazeGenerator
-from mazegen.solver import Solver
+from mazegen.show_path import Solver
 from mazegen.playmode import PlayMode
 # Import PALETTES and render_ascii from your renderer
 from renderer import render_ascii, PALETTES
@@ -92,7 +92,7 @@ def main() -> None:
             "pattern": pal["pattern"],
         }
         while True:
-            print(f"\n{YELLOW}Created by Mohamed Amine Asselgui & Saad Elhor"
+            print(f"\n{YELLOW}Created by masselgu & selhor"
                   "\nTeam: Wlad Lkhayriya")
             print(f"\n\n\n\n {GREEN}Theme: {PALETTES[pal_idx]['name']}")
             print(f"{BLUE} ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄"

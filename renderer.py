@@ -2,12 +2,18 @@ from typing import List, Tuple, Set, Dict
 
 # Professional Xterm-256 color palettes
 PALETTES: List[Dict[str, str]] = [
-    {"name": "Classic/Bold", "walls": "38;5;160", "inner": "38;5;231", "pattern": "38;5;21"},
-    {"name": "Vibrant/Natural", "walls": "38;5;30", "inner": "38;5;201", "pattern": "38;5;220"},
-    {"name": "Earth/Moody", "walls": "38;5;172", "inner": "38;5;235", "pattern": "38;5;244"},
-    {"name": "Calm/Modern", "walls": "38;5;182", "inner": "38;5;181", "pattern": "38;5;103"},
-    {"name": "Dynamic", "walls": "38;5;34", "inner": "38;5;208", "pattern": "38;5;129"},
-    {"name": "Crisp/Natural", "walls": "38;5;24", "inner": "38;5;15", "pattern": "38;5;196"}
+    {"name": "Classic/Bold", "walls": "38;5;160", "inner": "38;5;231",
+     "pattern": "38;5;21"},
+    {"name": "Vibrant/Natural", "walls": "38;5;30", "inner": "38;5;201",
+     "pattern": "38;5;220"},
+    {"name": "Earth/Moody", "walls": "38;5;172", "inner": "38;5;235",
+     "pattern": "38;5;244"},
+    {"name": "Calm/Modern", "walls": "38;5;182", "inner": "38;5;181",
+     "pattern": "38;5;103"},
+    {"name": "Dynamic", "walls": "38;5;34", "inner": "38;5;208",
+     "pattern": "38;5;129"},
+    {"name": "Crisp/Natural", "walls": "38;5;24", "inner": "38;5;15",
+     "pattern": "38;5;196"}
 ]
 
 ORANGE = "38;5;208"   # xterm orange
@@ -46,12 +52,12 @@ def render_ascii(
     p42 = get_42_pattern_coords(width, height) if show_42 else set()
 
     # ANSI symbols
-    V_WALL = f"\033[{origin_theme['walls']}m\u2503\033[0m"
-    H_WALL = f"\033[{origin_theme['walls']}m\u2501\u2501\u2501\033[0m"
-    TL, TR = f"\033[{origin_theme['walls']}m\u250F\033[0m", f"\033[{origin_theme['walls']}m\u2513\033[0m"
-    BL, BR = f"\033[{origin_theme['walls']}m\u2517\033[0m", f"\033[{origin_theme['walls']}m\u251B\033[0m"
-    JT, JB = f"\033[{origin_theme['walls']}m\u2501\033[0m", f"\033[{origin_theme['walls']}m\u2501\033[0m"
-    JL, JR = f"\033[{origin_theme['walls']}m\u2503\033[0m", f"\033[{origin_theme['walls']}m\u2503\033[0m"
+    V_WALL = (f"\033[{origin_theme['walls']}m\u2503\033[0m")
+    H_WALL = (f"\033[{origin_theme['walls']}m\u2501\u2501\u2501\033[0m")
+    TL, TR = (f"\033[{origin_theme['walls']}m\u250F\033[0m", f"\033[{origin_theme['walls']}m\u2513\033[0m")
+    BL, BR = (f"\033[{origin_theme['walls']}m\u2517\033[0m", f"\033[{origin_theme['walls']}m\u251B\033[0m")
+    JT, JB = (f"\033[{origin_theme['walls']}m\u2501\033[0m", f"\033[{origin_theme['walls']}m\u2501\033[0m")
+    JL, JR = (f"\033[{origin_theme['walls']}m\u2503\033[0m", f"\033[{origin_theme['walls']}m\u2503\033[0m")
     JI = f"\033[{origin_theme['inner']}m✦\033[0m"
 
     for y in range(height):
@@ -88,5 +94,6 @@ def render_ascii(
         print(mid_line)
 
     # Bottom line
-    bottom_line = BL + "".join(H_WALL + (JB if x < width - 1 else BR) for x in range(width))
+    bottom_line = BL + "".join(H_WALL + (JB if x < width - 1 else BR)
+                               for x in range(width))
     print(bottom_line)
