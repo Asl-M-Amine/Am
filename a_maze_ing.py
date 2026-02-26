@@ -42,7 +42,7 @@ def generate_and_render(config, pal_idx, animate=True):
         height=config.height,
         entry=config.entry,
         exit=config.exit,
-        seed=random.randint(0, 999999),
+        seed=config.seed if config.seed else random.randint(0, 999999),
     )
     pal = PALETTES[pal_idx]
     theme = {"walls": pal["walls"], "inner": pal["inner"],
