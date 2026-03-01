@@ -15,8 +15,8 @@ class MazeGenerator:
         self,
         width: int,
         height: int,
-        entry: Tuple[int, int] = (0, 0),
-        exit: Tuple[int, int] = (0, 0),
+        entry: Tuple[int, int],
+        exit: Tuple[int, int],
         seed: Optional[int] = None,
     ) -> None:
         self.width = width
@@ -25,7 +25,6 @@ class MazeGenerator:
         self.exit = exit
         self.rng = random.Random(seed)
 
-        # Grid: each cell holds wall bitmask
         self.grid: List[List[int]] = [
             [N | E | S | W for _ in range(width)] for _ in range(height)
         ]
@@ -33,16 +32,10 @@ class MazeGenerator:
             [False for _ in range(width)] for _ in range(height)
         ]
 
-        # Blocked cells for the "42" pattern
         self.blocked = self._create_42_pattern()
-
-    # -----------------------------
 
     def _create_42_pattern(self) -> Set[Tuple[int, int]]:
         """Return coordinates for 42 pattern."""
-        if self.width < 7 or self.height < 5:
-            return set()
-
         start_x = (self.width - 7) // 2
         start_y = (self.height - 5) // 2
 
@@ -61,21 +54,6 @@ class MazeGenerator:
                     blocked.add((start_x + dx, start_y + dy))
         return blocked
 
-    # -----------------------------
-
-    def get_unvisited_neighbors(self, x: int, y: int, visited: set) -> list:
-        """Return unvisited neighbors for DFS."""
-        neighbors = []
-        directions = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # N, E, S, W
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < self.width and 0 <= ny < self.height:
-                if (nx, ny) not in visited:
-                    neighbors.append((nx, ny))
-        return neighbors
-
-    # -----------------------------
-
     def remove_wall(self, a: Tuple[int, int], b: Tuple[int, int]) -> None:
         """Remove wall between two adjacent cells."""
         x1, y1 = a
@@ -93,13 +71,61 @@ class MazeGenerator:
             self.grid[y1][x1] &= ~N
             self.grid[y2][x2] &= ~S
 
-    # -----------------------------
+    def _break_random_walls(self, extra_paths: int = None) -> None:
+        """
+        Break random walls to create extra paths, but:
+        - corridors stay max 2 cells wide/height
+        - avoids merging too many open cells
+        """
+        if extra_paths is None:
+            extra_paths = int((self.width * self.height) / 10)
 
-    def generate_animated(self):
+        added = 0
+        attempts = 0
+        max_attempts = extra_paths * 20
+
+        while added < extra_paths and attempts < max_attempts:
+            x = self.rng.randint(0, self.width - 1)
+            y = self.rng.randint(0, self.height - 1)
+            directions = [N, E, S, W]
+            self.rng.shuffle(directions)
+
+            for d in directions:
+                nx, ny = x + DX[d], y + DY[d]
+
+                if 0 <= nx < self.width and 0 <= ny < self.height:
+                    # Skip blocked or entry/exit
+                    if (x, y) in self.blocked or (nx, ny) in self.blocked:
+                        continue
+                    if (x, y) in [self.entry, self.exit] or (nx, ny) in [self.entry, self.exit]:
+                        continue
+                    # Only break if wall exists
+                    if self.grid[y][x] & d:
+                        # Check if breaking creates a 3x3 open area
+                        open_count = 0
+                        for dx in [-1, 0, 1]:
+                            for dy in [-1, 0, 1]:
+                                tx, ty = nx + dx, ny + dy
+                                if 0 <= tx < self.width and 0 <= ty < self.height:
+                                    if self.grid[ty][tx] != (N | E | S | W):
+                                        open_count += 1
+                        if open_count > 4:
+                            # Too many adjacent open cells → skip
+                            continue
+
+                        self.remove_wall((x, y), (nx, ny))
+                        added += 1
+                        break
+            attempts += 1
+
+    def generate_animated(self, perfect: bool = True):
+        """Generate maze with animation, yields grid each step."""
+
         visited = set()
-        entry = self.entry
-        visited.add(entry)
-        stack = [entry]
+        blocked = self.blocked
+
+        stack = [self.entry]
+        visited.add(self.entry)
 
         while stack:
             x, y = stack[-1]
@@ -149,8 +175,6 @@ class MazeGenerator:
                     self.grid[cy][cx] &= ~d
                     self.grid[ny][nx] &= ~OPPOSITE[d]
                     self._dfs(nx, ny)
-
-    # -----------------------------
 
     def get_cells(self) -> List[List[int]]:
         return self.grid

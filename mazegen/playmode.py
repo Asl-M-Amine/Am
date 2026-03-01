@@ -1,7 +1,6 @@
-import os
 import time
 from typing import TYPE_CHECKING, Tuple, Dict
-
+from a_maze_ing import clear_screen
 from mazegen.generator import E, N, S, W
 from renderer import render_ascii
 
@@ -27,7 +26,7 @@ class PlayMode:
         Start interactive play mode.
         Move with WASD, lose hearts on invalid moves.
         """
-        os.system("cls" if os.name == "nt" else "clear")
+        clear_screen()
         intro_text = "\033[1;31mHurry Up! Find the Exit!\033[0m"
         for c in intro_text:
             print(c, end="", flush=True)
@@ -41,23 +40,30 @@ class PlayMode:
         hearts = ["\033[1;31m\u2665\033[0m"] * 3  # fixed 3 hearts
 
         while True:
-            # Clear screen first
-            os.system("cls" if os.name == "nt" else "clear")
+            # Clear screen once per loop
+            clear_screen()
+        
+            # --- Maze and status ---
+            maze_cells = maze.get_cells()  # single copy for this iteration
+        
+            # Prepare 42 pattern dots
+            p42 = get_42_pattern_coords(maze.width, maze.height)
+            visited_temp = [[None for _ in range(maze.width)] for _ in range(maze.height)]
+            for x, y in p42:
+                visited_temp[y][x] = "•"
+        
+            # Mark current player position
+            visited_temp[py][px] = "@"
+            # Display hearts and steps
+            hearts_display = " ".join(hearts)
+            status_bar = f"[ {hearts_display} ]  Steps: {steps}"
+            border = "═" * 20
+            print(f"         ╔{border}╗")
+            print(f"         ║{status_bar} ║")
+            print(f"         ╚{border}╝\n")
 
-            # Status bar with hearts, steps, exit
-            hearts_display = ("".join(["\033[1;31m\u2665\033[0m "
-                                       for _ in hearts]))
-            status_bar = (f"[ {hearts_display}]  Steps: {steps}  "
-                          f"Exit: ({goal_x},{goal_y})")
-            border = "═" * len(status_bar)
 
-            print(f"╔{border}╗")
-            print(f"║{status_bar}║")
-            print(f"╚{border}╝")
-
-            # Fun instruction line (Pac-Man style)
-            print("Guide the mouse 🐁 with W/A/S/D. Can you escape to "
-                  "the cheese 🧀?\n")
+            # Render the maze
             render_ascii(
                 maze.get_cells(),
                 entry=(px, py),
@@ -70,9 +76,12 @@ class PlayMode:
                 print("\033[92mCongrats! You reached the exit!\033[0m")
                 time.sleep(1.5)
                 break
+            
+            # --- Movement input ---
 
-            move = input("Move: ").lower()
-            current_cell = maze.get_cells()[py][px]
+            # Fun instruction line
+            print("Guide the mouse 🐁 with 'W | A | S | D'. \nCan you escape to the cheese 🧀?\nOr exit with 'exit'\n")
+            move = input(">").strip().lower()
             moved = False
 
             if move == "w" and not (current_cell & N):

@@ -1,5 +1,5 @@
 from typing import List, Tuple, Set, Dict
-
+import time
 # Professional Xterm-256 color palettes
 PALETTES: List[Dict[str, str]] = [
     {"name": "Classic/Bold", "walls": "38;5;160", "inner": "38;5;231",
@@ -25,8 +25,6 @@ N, E, S, W = 1, 2, 4, 8
 
 def get_42_pattern_coords(width: int, height: int) -> Set[Tuple[int, int]]:
     """Exact same 7x5 coordinates logic as generator.py."""
-    if width < 7 or height < 5:
-        return set()
     start_x, start_y = (width - 7) // 2, (height - 5) // 2
     pattern = ["1000111", "1000001", "1110111", "0010100", "0010111"]
     blocked = set()
@@ -66,7 +64,9 @@ def render_ascii(
             char = (TL if x == 0 else JT) if y == 0 else (JL if x == 0 else JI)
             top_line += char + (H_WALL if (grid[y][x] & N) else "   ")
         top_line += (TR if y == 0 else JR)
+        # time.sleep(0.9)
         print(top_line)
+        # time.sleep(0.9)
 
         mid_line = ""
         for x in range(width):
